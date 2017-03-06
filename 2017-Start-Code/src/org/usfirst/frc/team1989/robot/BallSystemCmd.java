@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.Timer;
 
 public class BallSystemCmd implements cmd {
 
+	// Class Attributes
 	CANTalon1989 ballConveyor;
 	CANTalon1989 ballOutputWheel;
 	JsScaled driveStick;
@@ -16,22 +17,25 @@ public class BallSystemCmd implements cmd {
 	double wheelSpeed = 0;
 	Integer state1 = 0;
 	int state2 = 0;	
+	
+	// Constructor: Expects 2 motors and a JoyStick
 	public BallSystemCmd(CANTalon1989 ballConveyor, CANTalon1989 ballOutputWheel, JsScaled driveStick){
 		this.ballConveyor = ballConveyor;
 		this.ballOutputWheel = ballOutputWheel;
 		this.driveStick = driveStick;
 	}
 	
+	// Ball Intake Method - Used in Teleop
 	public void ballIntake(){
 		systemRunning = true;
-		ballConveyor.set(-1);
+		ballConveyor.set(1);
 		if (state1 == 0){
 			rampTime.stop();
 			rampTime.reset();
 			rampTime.start();
 			state1 = 1;
 		}
-		
+		// Ramp Up
 		if (wheelSpeed > -1){
 			if(rampTime.get() > 0.25){
 				wheelSpeed -= 0.2;
@@ -40,19 +44,21 @@ public class BallSystemCmd implements cmd {
 				rampTime.start();
 			}
 		}
+		// Update Speed
 		ballOutputWheel.set(wheelSpeed);
 		}
 	
+	// Ball Output Method - Used in Teleop
 	public void ballOutput(){
 		systemRunning = true;
-		ballConveyor.set(-1);
+		ballConveyor.set(1);
 		if (state2 == 0){
 			rampTime.stop();
 			rampTime.reset();
 			rampTime.start();
 			state2 = 1;
 		}
-		
+		// Ramp Up
 		if (wheelSpeed < 1){
 			if(rampTime.get() > 0.25){
 				wheelSpeed += 0.2;
@@ -61,9 +67,8 @@ public class BallSystemCmd implements cmd {
 				rampTime.start();
 			} 
 		}
-		
+		// Update Speed
 		ballOutputWheel.set(wheelSpeed);
-	
 	}
 	
 	
@@ -104,59 +109,60 @@ public class BallSystemCmd implements cmd {
 	public void teleopPeriodic() {
 		// TODO Auto-generated method stub
 		//Components.writemessage.setmessage(5, ballIntakeActive.toString() );
-		if(driveStick.getRawButton(11) == true){
-			//ballOutputActive = true;
-			//ballIntakeActive = false;
-		}
+
+		// Button 7 - Intake Balls
 		if(driveStick.getRawButton(7) == true){
-			//ballOutputActive = false;
-			//ballIntakeActive = true;
 			ballIntake();
-		} 		 //Turn off Ball motors
+		}
+		// Button 8 - Output Balls
 		else if(driveStick.getRawButton(8) == true){
-			//ballIntakeActive = false;
-			//ballOutputActive = false;
-			ballOutput();
-			
-			
-		} else {
-			
+			ballOutput();		
+		} else { // Begin the ramp down
+			// Turn off conveyer
 			ballConveyor.set(0);
+			
+			// Update Ball Speed
 			ballOutputWheel.set(wheelSpeed);
+			
+			// If system was running, begin lowering the speed and "turn off" the system.
 			if (systemRunning == true){
 				rampTime.stop();			
 				rampTime.reset();
 				rampTime.start(); 
 				systemRunning = false;
+				
+				// Make sure to reset the states
 				if (state1 != 0 || state2 != 0){
 					state1 = state2 = 0;
 				}
 			}
-				if (wheelSpeed < 0){
-					if(rampTime.get() > 0.25){
+			// Ramp the speed up from negative.
+			if (wheelSpeed < 0){
+				if(rampTime.get() > 0.25){
+					if(wheelSpeed + 0.2 <= -0.2){
 						wheelSpeed += 0.2;
-						rampTime.stop();
-						rampTime.reset();
-						rampTime.start();
-					
+					}else{
+						wheelSpeed = 0;
 					}
-				} if (wheelSpeed > 0){
-						if(rampTime.get() > 0.25){
-							wheelSpeed -= 0.2;
-							rampTime.stop();
-							rampTime.reset();
-							rampTime.start();
-						}
+					rampTime.stop();
+					rampTime.reset();
+					rampTime.start();
 				}
-			}	
+			}
 			
-		//if(ballOutputActive){
-		//ballOutput();
-	
-		//if(ballIntakeActive){
-		//ballIntake();
-		}
+			// Ramp the speed down from positive
+			if (wheelSpeed > 0){
+				if(rampTime.get() > 0.25){
+					if(wheelSpeed - 0.2 >= .2){
+						wheelSpeed -= 0.2;
+					}else{
+						wheelSpeed = 0;
+					}
+					rampTime.stop();
+					rampTime.reset();
+					rampTime.start();
+				}
+			}
+		}	
 	}
-
-
-
+}

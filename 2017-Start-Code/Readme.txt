@@ -18,8 +18,8 @@ Button Information:
 5 - 
 6 - 
 7 - Activate Ball Intake
-8 - Deactivate Ball Motors 
-9 - Output Balls
+8 - Output Balls
+9 - 
 10 - Gear Push Backward
 11 - Gear Push Forward
 12 - Gear Actuator Routine
