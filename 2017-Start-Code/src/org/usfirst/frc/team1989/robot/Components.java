@@ -20,7 +20,7 @@ public final class Components {
 	static Servo servoX = new Servo(0);
 	static Servo servoY = new Servo(1);
 	
-	static DigitalInput gearLimit = new DigitalInput(2);
+	static DigitalInput gearLimit = new DigitalInput(0);
 
 	// Instantiating Joysticks
 	static JsScaled driveStick = new JsScaled(0);

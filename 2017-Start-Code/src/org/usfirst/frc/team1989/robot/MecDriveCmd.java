@@ -67,34 +67,39 @@ public class MecDriveCmd implements cmd {
 		if (startPower > 0){
 			speedRamp = -speedRamp;
 		}
-		if (Math.abs(driveBackLeft.getEncPosition()) <= pulseCount){
-			if(remainingDistance < breakDistance ){
-				if (minPower < currentPower){	
-					rampTimer.start();
-					if (rampTimer.get() > 0.2){
-						currentPower += speedRamp;
-						rampTimer.stop();
-						rampTimer.reset();	
+		if (inches == 0){
+			
+		}
+		else{
+			if (Math.abs(driveBackLeft.getEncPosition()) <= pulseCount){
+				if(remainingDistance < breakDistance ){
+					if (minPower < currentPower){	
+						rampTimer.start();
+						if (rampTimer.get() > 0.2){
+							currentPower += speedRamp;
+							rampTimer.stop();
+							rampTimer.reset();	
+						}
+						else{
+							currentPower = minPower;
+						}
 					}
-					else{
-						currentPower = minPower;
-					}
+				} else{
+					currentPower = startPower;
 				}
-			} else{
-				currentPower = startPower;
+			
+			
+			
+				
+				
+				
+				driveStick.pY = currentPower;
+				driveFlag = true;
+			} else {
+				driveStick.pY = 0.0;
+				driveFlag = false;
 			}
-			
-			
-			
-			
-			
-			
-			driveStick.pY = currentPower;
-			driveFlag = true;
-		} else {
-			driveStick.pY = 0.0;
-			driveFlag = false;
-		} 
+		}
 	}
 	
 	// Make the robot drive straight

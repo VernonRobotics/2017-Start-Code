@@ -67,9 +67,9 @@ public class Robot extends IterativeRobot implements cmd{
 	}
 		
 	
-	public void auto1(){
+	public void autoGearStraight(){
 		if(autoStatus == 0){
-			mDrive.driveFoward(90, 0.6);
+			mDrive.driveFoward(90, 0.4);
 			if(mDrive.driveFlag == false){
 				autoStatus = 1;
 			}
@@ -102,6 +102,14 @@ public class Robot extends IterativeRobot implements cmd{
 		for (int i = 0; i < SharedStuff.cmdlist.size(); i++) {
 			SharedStuff.cmdlist.get(i).teleopPeriodic();
 		}
+		if(Components.gearLimit.get() == true){
+			Components.writemessage.setmessage(3,"depressed");
+		}
+		else{
+			Components.writemessage.setmessage(3, "not depressed");
+		}
+		
+		Components.writemessage.updatedash();
 		
 		
 	}
