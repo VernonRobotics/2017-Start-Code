@@ -69,35 +69,9 @@ public class Robot extends IterativeRobot implements cmd{
 	
 	public void auto1(){
 		if(autoStatus == 0){
-			if(averageEncPos < 95 * encoderPulseRatio){
-				Components.driveStick.pY = -0.6;
-			} else{
+			mDrive.driveFoward(90, 0.6);
+			if(mDrive.driveFlag == false){
 				autoStatus = 1;
-				Components.driveStick.pY = -0.4; //slow enough to drive but need to not smash the wall	
-				 checkAmpValue = Components.driveBackLeft.getOutputCurrent();
-			}
-		}	
-		if (autoStatus == 1){	
-			if (Components.driveBackLeft.getOutputCurrent() < checkAmpValue*2){//not sure if that is correct
-				Components.driveStick.pY = -0.4;
-			} else{
-				Components.driveStick.pY = 0.0;
-				autoStatus = 2;
-				gearPusher.gearPushStart();
-			}				
-		}
-		if (autoStatus == 2){
-			if(gearPusher.pushRoutine == true){
-				gearPusher.gearPush();
-			} else{
-				autoStatus = 3;
-			}
-		}
-		if(autoStatus == 3){
-			if(averageEncPos < 10 * encoderPulseRatio){
-				Components.driveStick.pY = 0.6;
-			} else{
-				Components.driveStick.pY = 0.0;
 			}
 		}
 	}
