@@ -1,5 +1,6 @@
 package org.usfirst.frc.team1989.robot;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 
@@ -18,6 +19,8 @@ public final class Components {
 	// Instantiating Servo
 	static Servo servoX = new Servo(0);
 	static Servo servoY = new Servo(1);
+	
+	static DigitalInput gearLimit = new DigitalInput(0);
 
 	// Instantiating Joysticks
 	static JsScaled driveStick = new JsScaled(0);
@@ -25,6 +28,8 @@ public final class Components {
 	
 	// Instantiate Gyro (Doesn't work)
 	static Gyro gyro;
+	
+	
 	
 	static writemessage writemessage = new writemessage();
 

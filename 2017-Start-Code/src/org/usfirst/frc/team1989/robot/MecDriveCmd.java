@@ -13,11 +13,14 @@ public class MecDriveCmd implements cmd {
 	CANTalon1989 driveBackRight;// encoder motor
 	RobotDrive driveTrain;
 	JsScaled driveStick;
-	int encPulseRatio = 63;
+	int encPulseRatio = 73;
 	int breakDistance = 756;
+	int remainingDistance;
+	double currentPower;
 	double minPower = 0.2;
 	double speedRamp = 0.05;
 	boolean driveFlag = false;
+	Timer rampTimer = new Timer();
 	
 	// Part of the Encoder Test (needs class scope, or it would go in test init)
 	Integer encoderLeftCount = 0;
@@ -27,7 +30,7 @@ public class MecDriveCmd implements cmd {
 	Integer deltaEncValue;
 	Double driveTempAdjustment;
 	Double driveTwistAdjustment = 0.0;
-	double temp = 8.0;
+	int temp = 0;
 	
 	public MecDriveCmd(CANTalon1989 driveFrontLeft, CANTalon1989 driveBackLeft, CANTalon1989 driveFrontRight, CANTalon1989 driveBackRight, JsScaled driveStick){
 		this.driveFrontLeft = driveFrontLeft;
@@ -58,21 +61,45 @@ public class MecDriveCmd implements cmd {
 	}
 	
 	// Convert distance to encoder values
-	public void driveFoward(double inches, double power){//assumes encoder reset to 0, must be driven backwards
-		double pulseCount = inches * encPulseRatio;
-		if (power > 0){
+	public void driveFoward(int inches, double startPower){//assumes encoder reset to 0, must be driven backwards
+		int pulseCount = inches * encPulseRatio;
+		remainingDistance = pulseCount - Math.abs(driveBackLeft.getEncPosition());
+		if (startPower > 0){
 			speedRamp = -speedRamp;
 		}
-		if (Math.abs(driveBackLeft.getEncPosition()) < pulseCount || Math.abs(driveBackRight.getEncPosition()) < pulseCount){
-			if ((pulseCount - Math.abs(driveBackLeft.getEncPosition())) <= (breakDistance *  (temp /8))){
-					power += speedRamp; 
-					temp -=1;
+		if (inches == 0){
+			
+		}
+		else{
+			if (Math.abs(driveBackLeft.getEncPosition()) <= pulseCount){
+				if(remainingDistance < breakDistance ){
+					if (minPower < currentPower){	
+						rampTimer.start();
+						if (rampTimer.get() > 0.2){
+							currentPower += speedRamp;
+							rampTimer.stop();
+							rampTimer.reset();	
+						}
+						else{
+							currentPower = minPower;
+						}
+					}
+				} else{
+					currentPower = startPower;
+				}
+			
+			
+			
+				
+				
+				
+				driveStick.pY = currentPower;
+				driveFlag = true;
+			} else {
+				driveStick.pY = 0.0;
+				driveFlag = false;
 			}
-			driveStick.pY = power;
-		} else {
-			driveStick.pY = 0.0;
-			driveFlag = false;
-		} 
+		}
 	}
 	
 	// Make the robot drive straight
@@ -119,7 +146,7 @@ public class MecDriveCmd implements cmd {
 		driveBackRight.setEncPosition(0);
 	}
 	public void autonomousPeriodic() {
-		driveFoward(114, 0.6);
+		driveFoward(200, 0.4);
 		//Components.writemessage.setmessage(5, driveStick.pY.toString());
 		//Components.writemessage.updatedash();
 		driveTrain.mecanumDrive_Cartesian(driveStick.pX, driveStick.pY, driveStick.pTwist,0);//Last 0 is gyro angle needs to be checked if we get one
